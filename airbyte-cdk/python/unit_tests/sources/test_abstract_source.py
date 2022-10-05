@@ -2,6 +2,7 @@
 # Copyright (c) 2022 Airbyte, Inc., all rights reserved.
 #
 
+from importlib import invalidate_caches
 import logging
 from collections import defaultdict
 from typing import Any, Callable, Dict, Iterable, List, Mapping, MutableMapping, Optional, Tuple, Union
@@ -800,3 +801,10 @@ def test_checkpoint_state_from_stream_instance():
     assert actual_message == _as_state(
         {"teams": {"updated_at": "2022-09-11"}, "managers": {"updated": "expected_here"}}, "managers", {"updated": "expected_here"}
     )
+
+
+def test_airbyte_record_message_custom_data_validation_error():
+    stream = MockStream(name="my_stream")
+    invalid_data = "Not a dict"
+    with pytest.raises(ValueError):
+        AirbyteRecordMessage(stream=stream, data=invalid_data, emitted_at=GLOBAL_EMITTED_AT)
